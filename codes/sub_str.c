@@ -63,7 +63,6 @@ int split_str(char* str/*in*/, char* delimiter/*in*/, char** result_arr/*out*/)
     }
 
     tmp_str = str;
-    int size = 0;
 
     int i = 0;
     char* p;

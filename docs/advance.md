@@ -117,3 +117,130 @@ free(p);
 ```
 
 ![image-20200411202204350](./media/二级指针内存模型3.png)
+
+当使用 malloc 循环分配内存的时候，如果中断了，可以使用 goto 语句将已分配的内存释放
+
+```c
+for()
+{
+    char* p = (char*)malloc(size);
+    if(NULL == p)
+    {
+        goto FREE_MEM;
+    }
+}
+
+FREE_MEM:
+for()
+{
+    if(NULL != p)
+    {
+        free(p);
+    }
+}
+```
+
+
+
+
+
+## 二维数组
+
+### 自定义数组类型
+
+```c
+typedef int (MyArray)[10];
+MyArray myArray;
+int i;
+for(i = 0; i < 10; i++)
+{
+    myArray[i] = i+1;
+}
+```
+
+
+
+### 数组指针
+
+定义一个指针，该指针指向一个数组，该指针就叫数组指针
+
+#### 第一种定义方法
+
+```c
+typedef int (MyArray)[10];
+int arr[10];
+MyArray* pArray;
+pArray = &arr;
+```
+
+
+
+#### 第二种定义方法
+
+```c
+typedef int (*PArray)[10];
+int arr[10];
+PArray pArray;
+pArray = &arr;
+```
+
+
+
+#### 第三种定义方法 
+
+```c
+int (*pArray)[10];
+int arr[10];
+pArray = &arr;
+```
+
+
+
+#### 数组指针和多维数组的关系
+
+```c
+#include <stdio.h>                                                                 
+#include <string.h>                                                                
+#include <stdlib.h>                                                                
+
+int main(int argc, char** argv)                                                    
+{                                                                                  
+    int a[3][5];                                                                   
+    int i, j, k = 0;                                                               
+    for(i = 0; i < 3; i++)                                                         
+    {                                                                              
+        for(j = 0; j < 5; j++)                                                     
+        {                                                                          
+            a[i][j] = k++;                                                         
+        }                                                                          
+    }                                                                              
+
+    for(i = 0; i < 3; i++)                                                         
+    {                                                                              
+        for(j = 0; j < 5; j++)                                                     
+        {                                                                          
+            printf("a[%d][%d] = %d\n", i, j, a[i][j]);                             
+        }                                                                          
+    }                                                                              
+
+    int (*pArray)[5];                                                              
+    pArray = a;                                                                    
+    for(i = 0; i < 3; i++)                                                         
+    {                                                                              
+        for(j = 0; j < 5; j++)                                                     
+        {                                                                          
+            printf("a[%d][%d] = %d\n", i, j, pArray[i][j]);                        
+        }                                                                          
+    }      
+    
+    printf("pArray = %p, &a[0] = %p\n", pArray, &a[0]);
+    printf("pArray+1 = %p, &a[1] = %p\n", pArray+1, &a[1]);
+
+    return 0;                                                                      
+}                             
+```
+
+- 数组指针相当于二维数组的首元素地址
+- 数组指针 +i 相当于第 i 个元素地址
+- 同理可得，*(pArray+i) +j 为第 i 行第 j 列的地址
+- 同理可得，\*(*(pArray+i) +j ) 为第 i 行第 j 列的值
